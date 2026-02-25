@@ -253,9 +253,9 @@ app.get("/", (req, res) => {
 /* ===============================
    RENDER SERVER HEARTBEAT
 ================================ */
-const RENDER_SERVER_URL = "https://prakashmedical-server-4.onrender.com";
+const RENDER_SERVER_URL = "https://df-8byr.onrender.com";
 
-// Function to ping Render server
+// // Function to ping Render server
 const pingRenderServer = async () => {
   try {
     const response = await axios.get(`${RENDER_SERVER_URL}/`);
@@ -265,10 +265,10 @@ const pingRenderServer = async () => {
   }
 };
 
-// Ping Render server every 10 minutes (600000 ms)
+// // Ping Render server every 10 minutes (600000 ms)
 setInterval(pingRenderServer, 600000);
 
-// Initial ping on server start
+// // Initial ping on server start
 pingRenderServer();
 
 /* ===============================
