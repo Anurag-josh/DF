@@ -33,23 +33,8 @@ const storage = multer.diskStorage({
   },
 });
 
-function checkFileType(file, cb) {
-  const filetypes = /jpg|jpeg|png/;
-  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = filetypes.test(file.mimetype);
-
-  if (extname && mimetype) {
-    return cb(null, true);
-  } else {
-    cb('Images only!');
-  }
-}
-
 const upload = multer({
   storage,
-  fileFilter: function (req, file, cb) {
-    checkFileType(file, cb);
-  },
 });
 
 // Make uploads folder static
@@ -65,6 +50,7 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
   res.status(400).send({ error: error.message });
 });
 
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Atlas Connected"))
@@ -75,11 +61,12 @@ mongoose
 ================================ */
 const Product = require("./models/Product");
 const Order = require("./models/Order");
+const Banner = require("./models/Banner");
 
 /* ===============================
    USER ROUTES ONLY
 ================================ */
-
+//uploads
 //
 // 1️⃣ GET ALL PRODUCTS
 //
@@ -113,8 +100,37 @@ app.get("/api/products", async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 });
-
+// 1️⃣ GET ALL PRODUCTS
 //
+app.get("/api/products", async (req, res) => {
+  // ... existing code ...
+});
+
+/* ===============================
+   GET ACTIVE BANNERS (PUBLIC)
+================================ */
+app.get("/api/banners", async (req, res) => {
+  try {
+    const banners = await Banner.find({ isActive: true })
+      .sort({ order: 1, createdAt: -1 });
+
+    console.log("--------------------------------------------------");
+    console.log("DEBUG: Serving /api/banners");
+    console.log("DEBUG: Mongo URI:", process.env.MONGO_URI ? process.env.MONGO_URI.replace(/\/\/([^:]+):([^@]+)@/, "//***:***@") : "UNDEFINED");
+    console.log("DEBUG: Found banners count:", banners.length);
+    if (banners.length > 0) {
+      console.log("DEBUG: First banner Image:", banners[0].image);
+    }
+    console.log("--------------------------------------------------");
+
+    res.json(banners);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+//res.send(req.file.path);
+//admin
 // 2️⃣ PLACE ORDER
 //
 app.post("/api/orders", async (req, res) => {
