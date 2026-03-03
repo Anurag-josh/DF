@@ -315,23 +315,23 @@ app.get("/", (req, res) => {
 // /* ===============================
 //    RENDER SERVER HEARTBEAT
 // ================================ */
-// const RENDER_SERVER_URL = "https://df-8byr.onrender.com";
+const RENDER_SERVER_URL = "https://df-1-prc8.onrender.com";
 
-// // // Function to ping Render server
-// const pingRenderServer = async () => {
-//   try {
-//     const response = await axios.get(`${RENDER_SERVER_URL}/`);
-//     console.log(`[${new Date().toISOString()}] Render server ping successful: ${response.status}`);
-//   } catch (error) {
-//     console.log(`[${new Date().toISOString()}] Render server ping failed:`, error.message);
-//   }
-// };
+// // Function to ping Render server
+const pingRenderServer = async () => {
+  try {
+    const response = await axios.get(`${RENDER_SERVER_URL}/`);
+    console.log(`[${new Date().toISOString()}] Render server ping successful: ${response.status}`);
+  } catch (error) {
+    console.log(`[${new Date().toISOString()}] Render server ping failed:`, error.message);
+  }
+};
 
-// // // Ping Render server every 10 minutes (600000 ms)
-// setInterval(pingRenderServer, 600000);
+// // Ping Render server every 10 minutes (600000 ms)
+setInterval(pingRenderServer, 600000);
 
-// // // Initial ping on server start
-// pingRenderServer();
+// // Initial ping on server start
+pingRenderServer();
 
 /* ===============================
    START SERVER
