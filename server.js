@@ -228,6 +228,23 @@ app.get("/api/orders", async (req, res) => {
 });
 
 //
+// 3.5️⃣ GET BATCH ORDERS (for local app users without auth)
+//
+app.post("/api/orders/batch", async (req, res) => {
+  try {
+    const { orderIds } = req.body;
+    if (!orderIds || !Array.isArray(orderIds)) {
+      return res.status(400).json({ message: "Invalid order IDs" });
+    }
+    const orders = await Order.find({ _id: { $in: orderIds } }).sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+//
 // 4️⃣ GET ORDER BY ID
 //
 app.get("/api/orders/:id", async (req, res) => {
@@ -243,6 +260,51 @@ app.get("/api/orders/:id", async (req, res) => {
   }
 });
 
+//
+// 5️⃣ CONFIRM DELIVERY (User action)
+//
+app.put("/api/orders/:id/confirm-delivery", async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    // Update order status to Delivered
+    order.status = 'Delivered';
+    order.isDelivered = true;
+    order.deliveredAt = Date.now();
+
+    const updatedOrder = await order.save();
+    res.json(updatedOrder);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+//
+// 6️⃣ RATE & REVIEW ORDER (User action)
+//
+app.put("/api/orders/:id/rate-review", async (req, res) => {
+  try {
+    const { rating, reviewComment } = req.body;
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    order.reviewed = true;
+    order.rating = rating;
+    order.reviewComment = reviewComment;
+
+    const updatedOrder = await order.save();
+    res.json(updatedOrder);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
 /* ===============================
    TEST ROUTE
 ================================ */
@@ -250,26 +312,26 @@ app.get("/", (req, res) => {
   res.send("API running...");
 });
 
-/* ===============================
-   RENDER SERVER HEARTBEAT
-================================ */
-const RENDER_SERVER_URL = "https://df-8byr.onrender.com";
+// /* ===============================
+//    RENDER SERVER HEARTBEAT
+// ================================ */
+// const RENDER_SERVER_URL = "https://df-8byr.onrender.com";
 
-// // Function to ping Render server
-const pingRenderServer = async () => {
-  try {
-    const response = await axios.get(`${RENDER_SERVER_URL}/`);
-    console.log(`[${new Date().toISOString()}] Render server ping successful: ${response.status}`);
-  } catch (error) {
-    console.log(`[${new Date().toISOString()}] Render server ping failed:`, error.message);
-  }
-};
+// // // Function to ping Render server
+// const pingRenderServer = async () => {
+//   try {
+//     const response = await axios.get(`${RENDER_SERVER_URL}/`);
+//     console.log(`[${new Date().toISOString()}] Render server ping successful: ${response.status}`);
+//   } catch (error) {
+//     console.log(`[${new Date().toISOString()}] Render server ping failed:`, error.message);
+//   }
+// };
 
-// // Ping Render server every 10 minutes (600000 ms)
-setInterval(pingRenderServer, 600000);
+// // // Ping Render server every 10 minutes (600000 ms)
+// setInterval(pingRenderServer, 600000);
 
-// // Initial ping on server start
-pingRenderServer();
+// // // Initial ping on server start
+// pingRenderServer();
 
 /* ===============================
    START SERVER

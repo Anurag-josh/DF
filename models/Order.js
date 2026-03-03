@@ -54,9 +54,14 @@ const orderSchema = mongoose.Schema({
     // Order Status for Admin Panel
     status: {
         type: String,
-        enum: ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'],
+        enum: ['Pending', 'Confirmed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'],
         default: 'Pending'
-    }
+    },
+
+    // Rating & Review
+    reviewed: { type: Boolean, default: false },
+    rating: { type: Number, default: 0 },
+    reviewComment: { type: String, default: '' }
 }, {
     timestamps: true,
 });
